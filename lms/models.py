@@ -1,5 +1,4 @@
 from django.db import models
-
 from config.settings import AUTH_USER_MODEL
 
 
@@ -39,7 +38,7 @@ class Course(models.Model):
         ordering = ["pk"]
 
     def __str__(self):
-        return f"{self.title}"
+        return f"{self.name}"
 
 
 class Lesson(models.Model):
@@ -63,7 +62,9 @@ class Lesson(models.Model):
         upload_to="materials/lesson",
     )
     link_to_video = models.TextField(
-        verbose_name="Ссылка на видео", null=True, blank=True
+        verbose_name="Ссылка на видео",
+        null=True,
+        blank=True
     )
     course = models.ForeignKey(
         Course,
@@ -88,11 +89,12 @@ class Lesson(models.Model):
         ordering = ["pk"]
 
     def __str__(self):
-        return f"{self.title}"
+        return f"{self.name}"
 
+
+"""
 
 class Subscription(models.Model):
-    """Модель подписки на курс."""
 
     user = models.ForeignKey(
         AUTH_USER_MODEL,
@@ -113,3 +115,5 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.user}"
+        
+"""
