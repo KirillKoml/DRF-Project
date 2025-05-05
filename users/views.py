@@ -3,14 +3,15 @@ from rest_framework import filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from users.models import User, Payment
-from users.permissions import UserHimself
+#from users.permissions import UserHimself
 from users.serializers import UserSerializer, PaymentSerializer, UserCreateSerializer, UserUpdateSerializer, \
     UserNonCreatorSerializer, PaymentStatusSerializer
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from users.services import conversion_rub_into_usd, create_stripe_price, create_stripe_session, create_stripe_product, \
-    checking_status_payment
+
+#from users.services import conversion_rub_into_usd, create_stripe_price, create_stripe_session, create_stripe_product, \
+#    checking_status_payment
 
 
 # Create your views here.
@@ -36,11 +37,11 @@ class UserListAPIView(ListAPIView):
     serializer_class = UserSerializer
 
 
-class UserUpdateAPIView(UpdateAPIView):
-    """Класс для редактирования моделей пользователей."""
-    queryset = User.objects.all()
-    serializer_class = UserUpdateSerializer
-    permission_classes = (UserHimself, IsAuthenticated)
+#class UserUpdateAPIView(UpdateAPIView):
+#    """Класс для редактирования моделей пользователей."""
+#    queryset = User.objects.all()
+#    serializer_class = UserUpdateSerializer
+#    permission_classes = (UserHimself, IsAuthenticated)
 
 
 class UserRetrieveAPIView(RetrieveAPIView):
