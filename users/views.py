@@ -3,7 +3,7 @@ from rest_framework import filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from users.models import User, Payment
-#from users.permissions import UserHimself
+from users.permissions import UserHimself
 from users.serializers import UserSerializer, PaymentSerializer, UserCreateSerializer, UserUpdateSerializer, \
     UserNonCreatorSerializer, PaymentStatusSerializer
 
@@ -37,11 +37,11 @@ class UserListAPIView(ListAPIView):
     serializer_class = UserSerializer
 
 
-#class UserUpdateAPIView(UpdateAPIView):
-#    """Класс для редактирования моделей пользователей."""
-#    queryset = User.objects.all()
-#    serializer_class = UserUpdateSerializer
-#    permission_classes = (UserHimself, IsAuthenticated)
+class UserUpdateAPIView(UpdateAPIView):
+    """Класс для редактирования моделей пользователей."""
+    queryset = User.objects.all()
+    serializer_class = UserUpdateSerializer
+    permission_classes = (UserHimself, IsAuthenticated)
 
 
 class UserRetrieveAPIView(RetrieveAPIView):
