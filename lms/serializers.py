@@ -1,7 +1,7 @@
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 
-from lms.models import Course, Lesson
+from lms.models import Course, Lesson, Subscription
 
 
 class LessonSerializer(ModelSerializer):
@@ -25,4 +25,11 @@ class CourseCreateSerializer(ModelSerializer):
         model = Course
         fields = ('id', 'name', 'preview', 'description')
 
+
+class SubscriptionSerializer(ModelSerializer):
+    """Сериализатор для подписок на курс."""
+
+    class Meta:
+        model = Subscription
+        fields = '__all__'
 
