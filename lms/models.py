@@ -92,8 +92,6 @@ class Lesson(models.Model):
         return f"{self.name}"
 
 
-"""
-
 class Subscription(models.Model):
 
     user = models.ForeignKey(
@@ -115,5 +113,3 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.user}"
-        
-"""
