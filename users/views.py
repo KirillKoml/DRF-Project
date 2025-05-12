@@ -10,8 +10,8 @@ from users.serializers import UserSerializer, PaymentSerializer, UserCreateSeria
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-#from users.services import conversion_rub_into_usd, create_stripe_price, create_stripe_session, create_stripe_product, \
-#    checking_status_payment
+from users.services import conversion_rub_into_usd, create_stripe_price, create_stripe_session, create_stripe_product, \
+    checking_status_payment
 
 
 # Create your views here.
