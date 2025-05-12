@@ -21,7 +21,7 @@ class UserUpdateSerializer(ModelSerializer):
     """Сериализатор для моделей пользователей, кроме создания."""
     class Meta:
         model = User
-        fields = ('email', 'phone_number', 'city', 'profile_picture')
+        fields = ('email', 'phone', 'country', 'avatar')
 
 
 class UserSerializer(ModelSerializer):
@@ -31,7 +31,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'phone_number', 'city', 'profile_picture', 'payment_history', 'password')
+        fields = ('id', 'email', 'phone', 'country', 'avatar', 'payment_history', 'password')
 
 
 class UserNonCreatorSerializer(ModelSerializer):
@@ -39,7 +39,7 @@ class UserNonCreatorSerializer(ModelSerializer):
     профиля."""
     class Meta:
         model = User
-        fields = ('id', 'email', 'phone_number', 'city', 'profile_picture')
+        fields = ('id', 'email', 'phone', 'country', 'avatar')
 
 
 class PaymentStatusSerializer(ModelSerializer):
