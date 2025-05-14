@@ -1,10 +1,14 @@
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, CharField
 
 from lms.models import Course, Lesson, Subscription
+from lms.validators import validate_links
 
 
 class LessonSerializer(ModelSerializer):
+    """Сериализатор для моделей уроков."""
+    # Ввожу проверку на то, что ссылка из YouTube
+    link_to_video = CharField(validators=[validate_links])
     class Meta:
         model = Lesson
         fields = "__all__"
@@ -12,11 +16,26 @@ class LessonSerializer(ModelSerializer):
 
 class CourseSerializer(ModelSerializer):
     number_of_lessons = SerializerMethodField()
+    # Добавляю дополнительное поле, чтобы выводилось подписан ли текущий пользователь курс или нет
+    subscription = SerializerMethodField()
+
     def get_number_of_lessons(self, course):
+        """Метод для получения дополнительного поля - количество уроков."""
         return course.course.count()
+
+    def get_subscription(self, course):
+        """Метод для вывода подписан ли текущий пользователь курс или нет."""
+        try:
+            # Пытаюсь получить подписку на курс
+            subscription = Subscription.objects.get(user=self.context['request'].user, course=course)
+            return 'Подписка активна'
+
+        except Subscription.DoesNotExist:
+            # Если не получилось найти подписку, то сообщаю об этом пользователю
+            return 'Подписка не активна'
     class Meta:
         model = Course
-        fields = ("id", "name", "preview", "description", "creator", "number_of_lessons")
+        fields = ("id", "name", "preview", "description", "creator", "number_of_lessons", "subscription")
 
 
 class CourseCreateSerializer(ModelSerializer):

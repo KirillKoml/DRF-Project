@@ -3,15 +3,16 @@ import json
 import requests
 import math
 
-# Импортирую данные для получения ключа Stripe
-from dotenv import load_dotenv
-import os
+from config.settings import STRIPE_API_KEY
 
-load_dotenv()
+
+
+# Импортирую данные для получения ключа Stripe
+
 
 
 # Ключ Stripe
-stripe.api_key = os.getenv('key_stripe')
+stripe.api_key = STRIPE_API_KEY
 
 
 def create_stripe_product(product):
@@ -52,7 +53,7 @@ def create_stripe_session(stripe_price):
     # print(stripe_product['name'])
     session = stripe.checkout.Session.create(
         # Перенаправляем после покупки на главную страницу
-        success_url="http://127.0.0.1:8000/",
+        success_url="http://127.0.0.1:8000/course/",
         # Устанавливаем цену и количество покупаемого продукта
         line_items=[{"price": stripe_price.get('id'), "quantity": 1}],
         mode='payment',
