@@ -5,12 +5,6 @@ import math
 
 from config.settings import STRIPE_API_KEY
 
-
-
-# Импортирую данные для получения ключа Stripe
-
-
-
 # Ключ Stripe
 stripe.api_key = STRIPE_API_KEY
 
