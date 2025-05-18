@@ -2,6 +2,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, R
 from rest_framework import filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from lms.serializers import SubscriptionSerializer
 from users.models import User, Payment
 from users.permissions import UserHimself
 from users.serializers import UserSerializer, PaymentSerializer, UserCreateSerializer, UserUpdateSerializer, \
@@ -15,11 +16,24 @@ from users.services import conversion_rub_into_usd, create_stripe_price, create_
 
 
 # Create your views here.
+
 class UserCreateAPIView(CreateAPIView):
     """Класс для создания моделей пользователей."""
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
     permission_classes = (AllowAny,)
+    lookup_field = "id"
+
+    def get_serializer_class(self):
+        if getattr(self, "swagger_fake_view", False):
+            return UserSerializer
+        if self.action == "retrive":
+            if self.get_object() == self.request.user:
+                return UserSerializer
+            return SubscriptionSerializer
+        elif self.action =="list":
+            return SubscriptionSerializer
+        return UserSerializer
 
     def perform_create(self, serializer):
         """Вмешиваюсь в логику контроллера для его правильной регистрации пользователей."""

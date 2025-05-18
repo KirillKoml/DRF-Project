@@ -1,14 +1,11 @@
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import (
-    CreateAPIView,
-    ListAPIView,
-    RetrieveAPIView,
-    UpdateAPIView,
-    DestroyAPIView, get_object_or_404
-)
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, \
+    get_object_or_404
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from lms.models import Course, Lesson, Subscription
 from lms.paginators import CourseAndLessonPagination
@@ -16,6 +13,11 @@ from lms.serializers import CourseSerializer, LessonSerializer, CourseCreateSeri
 from users.permissions import ModeratorPermission, CreatorPermission
 
 
+# Create your views here.
+# Декоратор для CourseViewSet
+@method_decorator(name='list', decorator=swagger_auto_schema(
+    operation_description="Вывод списка курсов"
+))
 class CourseViewSet(ModelViewSet):
     """ViewSet для моделей курсов."""
     queryset = Course.objects.all()
@@ -24,6 +26,7 @@ class CourseViewSet(ModelViewSet):
     pagination_class = CourseAndLessonPagination
 
     def get_serializer_class(self):
+        """Метод для выбора другого сериализатора при создании модели."""
         if self.action == 'create':
             return CourseCreateSerializer
         return CourseSerializer
@@ -55,7 +58,15 @@ class CourseViewSet(ModelViewSet):
 
         return super().get_permissions()
 
-class LessonCreateApiView(CreateAPIView):
+    def perform_update(self, serializer):
+        # Получаю название курса
+        course_name = self.get_object()
+
+        # Получаю queryset подписанных пользователей
+        Subscription.objects.filter(course=course_name)
+
+
+class LessonCreateAPIView(CreateAPIView):
     """Класс для создания моделей уроков."""
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
@@ -69,35 +80,47 @@ class LessonCreateApiView(CreateAPIView):
         lesson.save()
 
 
-
-class LessonListApiView(ListAPIView):
+class LessonListAPIView(ListAPIView):
+    """Класс для вывода моделей уроков."""
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    # Доступ имеют только модераторы
     permission_classes = (ModeratorPermission | IsAdminUser, IsAuthenticated)
 
+    # Указываю пагинацию
+    pagination_class = CourseAndLessonPagination
 
-class LessonRetrieveApiView(RetrieveAPIView):
+
+class LessonRetrieveAPIView(RetrieveAPIView):
+    """Класс для вывода отдельной модели урока."""
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    # Доступ имеют только модераторы или создатель урока
     permission_classes = (ModeratorPermission | CreatorPermission, IsAuthenticated)
 
 
-class LessonUpdateApiView(UpdateAPIView):
+class LessonUpdateAPIView(UpdateAPIView):
+    """Класс для редактирования моделей уроков."""
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    # Доступ имеют только модератор и создатель урока
     permission_classes = (ModeratorPermission | CreatorPermission, IsAuthenticated)
 
 
-class LessonDestroyApiView(DestroyAPIView):
+class LessonDestroyAPIView(DestroyAPIView):
+    """Класс для удаления моделей уроков."""
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = (ModeratorPermission | CreatorPermission, IsAuthenticated)
+    # Доступ имеет только создатель урока
+    permission_classes = (~ModeratorPermission | CreatorPermission, IsAuthenticated)
 
-class SubscriptionApiView(APIView):
+
+class SubscriptionAPIView(APIView):
     """Класс для создания или удаления подписки на курс"""
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
 
+    @swagger_auto_schema(operation_description="description")
     def post(self, *args, **kwargs):
         # Получаю пользователя, id курса и сам курс
         user = self.request.user

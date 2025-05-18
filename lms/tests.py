@@ -13,16 +13,16 @@ class CourseTestCase(APITestCase):
     def setUp(self):
         """Создаю пользователя, курс, урок и авторизую пользователя."""
         self.user = User.objects.create(email='test_case@yandex.ru', password='12345', is_staff=True, is_superuser=True)
-        self.course = Course.objects.create(title='test_case_title', description='test_case_description',
+        self.course = Course.objects.create(name='test_case_title', description='test_case_description',
                                             creator=self.user)
-        self.lesson = Lesson.objects.create(title='test_case_title', description='test_case_description',
+        self.lesson = Lesson.objects.create(name='test_case_title', description='test_case_description',
                                             course=self.course, creator=self.user)
         self.client.force_authenticate(user=self.user)
 
     def test_course_retrieve(self):
         """Тест на детальный просмотр курса."""
         # Получаю урл для информации об отдельном курсе
-        url = reverse('materials:course-detail', args=(self.course.pk,))
+        url = reverse('lms:course-detail', args=(self.course.pk,))
 
         # Делаю запрос на полученный урл
         response = self.client.get(url)
@@ -37,16 +37,16 @@ class CourseTestCase(APITestCase):
 
         # Тест создание названия курса
         self.assertEqual(
-            data.get('title'), self.course.title
+            data.get('name'), self.course.name
         )
 
     def test_course_create(self):
         """Тест на создание курса."""
         # Получаю урл для информации о всех курсах
-        url = reverse('materials:course-list')
+        url = reverse('lms:course-list')
 
         # Заполняю данные курса
-        data = {'title': 'testov', 'description': 'testov', 'creator': self.user}
+        data = {'name': 'testov', 'description': 'testov', 'creator': self.user}
 
         # Делаю запрос на полученный урл
         response = self.client.post(url, data)
@@ -64,10 +64,10 @@ class CourseTestCase(APITestCase):
     def test_course_update(self):
         """Тест на обновление курса."""
         # Получаю урл для просмотра курса
-        url = reverse('materials:course-detail', args=(self.course.pk,))
+        url = reverse('lms:course-detail', args=(self.course.pk,))
 
         # Заполняю данные для обновления курса
-        data = {'title': 'testov'}
+        data = {'name': 'testov'}
 
         # Делаю запрос на полученный урл
         response = self.client.patch(url, data)
@@ -82,13 +82,13 @@ class CourseTestCase(APITestCase):
 
         # Тест обновление курса
         self.assertEqual(
-            data.get('title'), 'testov'
+            data.get('name'), 'testov'
         )
 
     def test_course_delete(self):
         """Тест на удаление курса."""
         # Получаю урл для просмотра курса
-        url = reverse('materials:course-detail', args=(self.course.pk,))
+        url = reverse('lms:course-detail', args=(self.course.pk,))
 
         # Делаю запрос на полученный урл
         response = self.client.delete(url)
@@ -106,7 +106,7 @@ class CourseTestCase(APITestCase):
     def test_course_list(self):
         """Тест на просмотр списка курсов."""
         # Получаю урл для информации о всех курсах
-        url = reverse('materials:course-list')
+        url = reverse('lms:course-list')
 
         # Делаю запрос на полученный урл
         response = self.client.get(url)
@@ -123,7 +123,7 @@ class CourseTestCase(APITestCase):
             "results": [
                 {
                     "id": self.course.pk,
-                    "title": self.course.title,
+                    "name": self.course.name,
                     "preview": None,
                     "description": self.course.description,
                     "number_of_lessons": Lesson.objects.filter(course=self.course.pk).count(),
@@ -144,16 +144,16 @@ class LessonTestCase(APITestCase):
     def setUp(self):
         """Создаю пользователя, курс, урок и авторизую пользователя."""
         self.user = User.objects.create(email='test_case@yandex.ru', password='12345', is_staff=True, is_superuser=True)
-        self.course = Course.objects.create(title='test_case_title', description='test_case_description',
+        self.course = Course.objects.create(title='test_case_name', description='test_case_description',
                                             creator=self.user)
-        self.lesson = Lesson.objects.create(title='test_case_title', description='test_case_description',
+        self.lesson = Lesson.objects.create(title='test_case_name', description='test_case_description',
                                             course=self.course, creator=self.user)
         self.client.force_authenticate(user=self.user)
 
     def test_lesson_retrieve(self):
         """Тест на детальный просмотр курса."""
         # Получаю урл для информации об отдельном уроке
-        url = reverse('materials:lesson-retrieve', args=(self.lesson.pk,))
+        url = reverse('lms:lesson-retrieve', args=(self.lesson.pk,))
 
         # Делаю запрос на полученный урл
         response = self.client.get(url)
@@ -168,16 +168,16 @@ class LessonTestCase(APITestCase):
 
         # Тест создание названия урока
         self.assertEqual(
-            data.get('title'), self.lesson.title
+            data.get('name'), self.lesson.name
         )
 
     def test_lesson_create(self):
         """Тест на создание урока."""
         # Получаю урл для создания урока
-        url = reverse('materials:lesson-create')
+        url = reverse('lms:lesson-create')
 
         # Заполняю данные урока
-        data = {'title': 'testov', 'description': 'testov', 'course': self.course.pk, 'creator': self.user.pk,
+        data = {'name': 'testov', 'description': 'testov', 'course': self.course.pk, 'creator': self.user.pk,
                 'link_to_video': 'https://www.youtube.com/'}
 
         # Делаю запрос на полученный урл
@@ -196,10 +196,10 @@ class LessonTestCase(APITestCase):
     def test_lesson_update(self):
         """Тест на обновление урока."""
         # Получаю урл для просмотра урока
-        url = reverse('materials:lesson-update', args=(self.lesson.pk,))
+        url = reverse('lms:lesson-update', args=(self.lesson.pk,))
 
         # Заполняю данные для обновления урока
-        data = {'title': 'testov'}
+        data = {'name': 'testov'}
 
         # Делаю запрос на полученный урл
         response = self.client.patch(url, data)
@@ -214,13 +214,13 @@ class LessonTestCase(APITestCase):
 
         # Тест обновление урока
         self.assertEqual(
-            data.get('title'), 'testov'
+            data.get('name'), 'testov'
         )
 
     def test_lesson_delete(self):
         """Тест на удаление урока."""
         # Получаю урл для удаления урока
-        url = reverse('materials:lesson-destroy', args=(self.lesson.pk,))
+        url = reverse('lms:lesson-destroy', args=(self.lesson.pk,))
 
         # Делаю запрос на полученный урл
         response = self.client.delete(url)
@@ -238,7 +238,7 @@ class LessonTestCase(APITestCase):
     def test_lesson_list(self):
         """Тест на просмотр списка уроков."""
         # Получаю урл для информации о всех уроках
-        url = reverse('materials:lesson-list')
+        url = reverse('lms:lesson-list')
 
         # Делаю запрос на полученный урл
         response = self.client.get(url)
@@ -257,7 +257,7 @@ class LessonTestCase(APITestCase):
                 {
                     "id": self.lesson.pk,
                     "link_to_video": None,
-                    "title": self.lesson.title,
+                    "name": self.lesson.name,
                     "description": self.lesson.description,
                     "preview": None,
                     "course": self.course.pk,
@@ -277,7 +277,7 @@ class SubscriptionTestCase(APITestCase):
     def setUp(self):
         """Создаю пользователя, курс, подписку на курс и авторизую пользователя."""
         self.user = User.objects.create(email='test_case@yandex.ru', password='12345', is_staff=True, is_superuser=True)
-        self.course = Course.objects.create(title='test_case_title', description='test_case_description',
+        self.course = Course.objects.create(title='test_case_name', description='test_case_description',
                                             creator=self.user)
         self.subscription = Subscription.objects.create(user=self.user, course=self.course)
         self.client.force_authenticate(user=self.user)
@@ -285,7 +285,7 @@ class SubscriptionTestCase(APITestCase):
     def test_subscription_delete(self):
         """Тест на удаление подписки на курс."""
         # Получаю урл для удаления подписки на курс
-        url = reverse('materials:subscription')
+        url = reverse('lms:subscription')
 
         # Создаю данные для запроса
         data = {"course": self.course.pk}
@@ -317,7 +317,7 @@ class SubscriptionTestCase(APITestCase):
         Subscription.objects.filter(pk=self.subscription.pk).delete()
 
         # Получаю урл для создания подписки на курс
-        url = reverse('materials:subscription')
+        url = reverse('lms:subscription')
 
         # Создаю данные для запроса
         data = {"course": self.course.pk}
