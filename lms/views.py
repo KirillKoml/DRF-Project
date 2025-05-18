@@ -11,6 +11,7 @@ from lms.models import Course, Lesson, Subscription
 from lms.paginators import CourseAndLessonPagination
 from lms.serializers import CourseSerializer, LessonSerializer, CourseCreateSerializer, SubscriptionSerializer
 from users.permissions import ModeratorPermission, CreatorPermission
+from lms.tasks import sending_email_to_course_subscribers
 
 
 # Create your views here.
@@ -63,7 +64,16 @@ class CourseViewSet(ModelViewSet):
         course_name = self.get_object()
 
         # Получаю queryset подписанных пользователей
-        Subscription.objects.filter(course=course_name)
+        queryset_users_subscribed_to_course = Subscription.objects.filter(course=course_name)
+
+        # Создаю список с пользователями которым надо отправить письмо об обновлении курса
+        email_course_subscribers_list = []
+        for email_users in queryset_users_subscribed_to_course:
+            email_course_subscribers_list.append(email_users.user.email)
+
+        # Добавляю отложенную задачу по отправке писем подписчикам курса
+        sending_email_to_course_subscribers.delay(email_course_subscribers_list)
+        serializer.save()
 
 
 class LessonCreateAPIView(CreateAPIView):

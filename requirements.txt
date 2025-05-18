@@ -9,3 +9,5 @@ django-filter==25.1
 stripe==12.1.0
 drf-yasg==1.21.10
 celery-5.5.2
+django_celery_beat-2.8.1,
+
