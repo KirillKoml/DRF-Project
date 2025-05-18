@@ -29,6 +29,6 @@ def blocking_user():
     # Начинаю сравнивать у каждого пользователя дату последнего входа и текущую дату и если разница более 30 дней, то
     # удаляю пользователя
     for user in users:
-        if today - user.last_login > timedelta(days=1):
+        if today - user.last_login > timedelta(days=30/31):
             user.is_active = False
             user.save()

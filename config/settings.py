@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "django_filters",
     "drf_yasg",
+    "django_celery_beat",
     "users",
     "lms",
 ]
@@ -158,3 +159,26 @@ SIMPLE_JWT = {
 STRIPE_API_KEY = {
     os.getenv('key_stripe')
 }
+
+# Будет ли использоваться Celery?
+celery_used = os.getenv('celery_used', False) == 'True'
+if celery_used:
+    # Настройки для Celery
+    CELERY_TIMEZONE = TIME_ZONE
+    CELERY_TASK_TRACK_STARTED = True
+    CELERY_TASK_TIME_LIMIT = 30 * 60
+
+    # Настройка для подключения Celery к Redis
+    CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+    CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+
+    # Настройка для Celery-beat
+    CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+    # настройка для создания своей периодической задачи
+    CELERY_BEAT_SCHEDULE = {
+        'blocking_user': {
+            'task': 'lms.tasks.blocking_user',
+            'schedule': timedelta(seconds=10),
+        },
+    }
