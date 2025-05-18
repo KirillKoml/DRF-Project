@@ -2,11 +2,11 @@ import stripe
 import json
 import requests
 import math
+from django.conf import settings
 
-from config.settings import STRIPE_API_KEY
 
 # Ключ Stripe
-stripe.api_key = STRIPE_API_KEY
+stripe.api_key = settings.STRIPE_API_KEY
 
 
 def create_stripe_product(product):

@@ -9,13 +9,17 @@ class LessonSerializer(ModelSerializer):
     """Сериализатор для моделей уроков."""
     # Ввожу проверку на то, что ссылка из YouTube
     link_to_video = CharField(validators=[validate_links])
+
     class Meta:
         model = Lesson
         fields = "__all__"
 
 
 class CourseSerializer(ModelSerializer):
+    """Сериализатор для моделей курсов, кроме создания."""
+    # Добавляю дополнительное поле - количество уроков
     number_of_lessons = SerializerMethodField()
+
     # Добавляю дополнительное поле, чтобы выводилось подписан ли текущий пользователь курс или нет
     subscription = SerializerMethodField()
 
@@ -33,9 +37,10 @@ class CourseSerializer(ModelSerializer):
         except Subscription.DoesNotExist:
             # Если не получилось найти подписку, то сообщаю об этом пользователю
             return 'Подписка не активна'
+
     class Meta:
         model = Course
-        fields = ("id", "name", "preview", "description", "creator", "number_of_lessons", "subscription")
+        fields = ('id', 'name', 'preview', 'description', 'number_of_lessons', 'creator', 'subscription')
 
 
 class CourseCreateSerializer(ModelSerializer):
@@ -47,8 +52,6 @@ class CourseCreateSerializer(ModelSerializer):
 
 class SubscriptionSerializer(ModelSerializer):
     """Сериализатор для подписок на курс."""
-
     class Meta:
         model = Subscription
-        fields = '__all__'
-
+        fields = "__all__"
