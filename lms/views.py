@@ -1,5 +1,6 @@
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -131,7 +132,10 @@ class SubscriptionAPIView(APIView):
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(operation_description="Класс для создания или удаления подписки на курс")
+    @swagger_auto_schema(operation_description="Класс для создания или удаления подписки на курс",
+                         methods=['put', 'post'],
+                         request_body=SubscriptionSerializer)
+    @api_view(['GET', 'PUT', 'POST'])
     def post(self, request, *args, **kwargs):
         # Получаю пользователя, id курса и сам курс
         user = self.request.user
@@ -152,4 +156,4 @@ class SubscriptionAPIView(APIView):
             sending_email_to_course_subscribers(course_id)
 
         # Возвращаю сообщение о статусе подписки
-        return Response({'message': message})
+        return Response({ message: 'message'})
