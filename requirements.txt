@@ -10,4 +10,10 @@ stripe==12.1.0
 drf-yasg==1.21.10
 celery-5.5.2
 django_celery_beat-2.8.1,
+asgiref==3.8.1
+sqlparse==0.5.3
+django-phonenumber-field
+phonenumberslite-9.0.5
+ipython==8.27.0
+setuptools==75.2.0
 

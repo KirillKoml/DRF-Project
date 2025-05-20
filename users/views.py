@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework import filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -24,6 +25,7 @@ class UserCreateAPIView(CreateAPIView):
     permission_classes = (AllowAny,)
     lookup_field = "id"
 
+    @swagger_auto_schema(responses={200: UserSerializer(many=True)})
     def get_serializer_class(self):
         if getattr(self, "swagger_fake_view", False):
             return UserSerializer
