@@ -1,4 +1,6 @@
 from django.db import models
+
+from config import settings
 from config.settings import AUTH_USER_MODEL
 
 
@@ -93,23 +95,26 @@ class Lesson(models.Model):
 
 
 class Subscription(models.Model):
+    """Модель подписки на курс."""
+    user = models.ForeignKey(AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             verbose_name='Пользователь который подписался на курс',
+                             related_name='user_subscription'
+                             )
+    course = models.ForeignKey(Course,
+                               on_delete=models.CASCADE,
+                               verbose_name='Курс на который подписался пользователь',
+                               related_name='course_subscription'
+                               )
 
-    user = models.ForeignKey(
-        AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        verbose_name="Пользователь который подписался на курс",
-        related_name="user_subscription",
-    )
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
-        verbose_name="Курс на который подписался пользователь",
-        related_name="course_subscription",
-    )
+
+    def get_user_email(self):
+        return self.user.email
+
+    def __str__(self):
+        return f"{self.user.email} подписан на {self.course.name}."
 
     class Meta:
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
-
-    def __str__(self):
-        return f"{self.user}"
+        unique_together = ('user', 'course')

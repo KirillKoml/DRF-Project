@@ -11,10 +11,10 @@ from lms.models import Course, Lesson, Subscription
 from lms.paginators import CourseAndLessonPagination
 from lms.serializers import CourseSerializer, LessonSerializer, CourseCreateSerializer, SubscriptionSerializer
 from users.permissions import ModeratorPermission, CreatorPermission
+
 from lms.tasks import sending_email_to_course_subscribers
 
 
-# Create your views here.
 # Декоратор для CourseViewSet
 @method_decorator(name='list', decorator=swagger_auto_schema(
     operation_description="Вывод списка курсов"
@@ -129,24 +129,27 @@ class SubscriptionAPIView(APIView):
     """Класс для создания или удаления подписки на курс"""
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
+    permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(operation_description="description")
-    def post(self, *args, **kwargs):
+    @swagger_auto_schema(operation_description="Класс для создания или удаления подписки на курс")
+    def post(self, request, *args, **kwargs):
         # Получаю пользователя, id курса и сам курс
         user = self.request.user
         course_id = self.request.data.get('course')
         course = get_object_or_404(Course, pk=course_id)
 
+        subs_item = Subscription.objects.filter(user=user, course=course)
         try:
             # Если программа смогла найти подписку, то я её удаляю
-            subscription_find = Subscription.objects.get(user=user, course=course)
-            subscription_find.delete()
+            subs_item.exist()
+            subs_item.delete()
             message = 'Подписка удалена'
+            sending_email_to_course_subscribers(course_id)
         except Subscription.DoesNotExist:
             # Если программа не смогла найти подписку, то я создаю эту подписку
-            subscription_create = Subscription.objects.create(user=user, course=course)
-            subscription_create.save()
+            Subscription.objects.create(user=user, course=course)
             message = 'Подписка добавлена'
+            sending_email_to_course_subscribers(course_id)
 
         # Возвращаю сообщение о статусе подписки
         return Response({'message': message})
