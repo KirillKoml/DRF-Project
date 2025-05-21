@@ -10,7 +10,13 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from lms.models import Course, Lesson, Subscription
 from lms.paginators import CourseAndLessonPagination
-from lms.serializers import CourseSerializer, LessonSerializer, CourseCreateSerializer, SubscriptionSerializer
+from lms.serializers import (
+    CourseSerializer,
+    LessonSerializer,
+    CourseCreateSerializer,
+    SubscriptionSerializer,
+    SuccessSubscriptionResponse
+)
 from users.permissions import ModeratorPermission, CreatorPermission
 
 from lms.tasks import sending_email_to_course_subscribers
@@ -132,10 +138,11 @@ class SubscriptionAPIView(APIView):
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(operation_description="Класс для создания или удаления подписки на курс",
-                         methods=['put', 'post'],
-                         request_body=SubscriptionSerializer)
-    @api_view(['GET', 'PUT', 'POST'])
+    @swagger_auto_schema(
+        operation_description="Создание или удаление подписки на курс",
+        request_body=SubscriptionSerializer,
+        responses={200: SuccessSubscriptionResponse}
+    )
     def post(self, request, *args, **kwargs):
         # Получаю пользователя, id курса и сам курс
         user = self.request.user
@@ -156,4 +163,4 @@ class SubscriptionAPIView(APIView):
             sending_email_to_course_subscribers(course_id)
 
         # Возвращаю сообщение о статусе подписки
-        return Response({ message: 'message'})
+        return Response({message: 'message'})

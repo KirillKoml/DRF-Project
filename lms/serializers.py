@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer, CharField
 
@@ -54,4 +55,8 @@ class SubscriptionSerializer(ModelSerializer):
     """Сериализатор для подписок на курс."""
     class Meta:
         model = Subscription
-        fields = "__all__"
+        fields = ("course",)
+
+
+class SuccessSubscriptionResponse(serializers.Serializer):
+    message = serializers.CharField()
